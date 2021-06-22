@@ -1,16 +1,19 @@
-import 'package:ads_proj/api/pdf_api.dart';
-import 'package:ads_proj/api/pdf_cadastro.dart';
 import 'package:ads_proj/db/cliente_database.dart';
 import 'package:ads_proj/models/cliente.dart';
+import 'package:ads_proj/pages/cadastro_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
-class FormularioCadastro extends StatefulWidget {
-  const FormularioCadastro({ Key? key }) : super(key: key);
+// ignore: must_be_immutable
+class EditFormularioCadastro extends StatefulWidget {
+  
+  EditFormularioCadastro(this.cliente);
+
+  Cliente cliente;
 
   @override
-  _FormularioCadastroState createState() => _FormularioCadastroState();
+  _EditFormularioCadastro createState() => _EditFormularioCadastro();
 }
 
 var maskNumberFomart = MaskTextInputFormatter(mask: '(##) #########');
@@ -19,7 +22,7 @@ var maskCNPJFormat = MaskTextInputFormatter(mask: '##.###.###/####-##');
 var maskCGFFormat = MaskTextInputFormatter(mask: '########-#'); 
 final formKey = GlobalKey<FormBuilderState>();
 
-class _FormularioCadastroState extends State<FormularioCadastro> {
+class _EditFormularioCadastro extends State<EditFormularioCadastro> {
   var moradiaOptions = [{'Propria' : true},{'Alugado' : false}];
   var pessoaOptions = [{'Juridica' : true}, {'Fisica' : false}];
 
@@ -27,7 +30,7 @@ class _FormularioCadastroState extends State<FormularioCadastro> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Novo Cadastro', style: TextStyle(color: Colors.blue.shade900, fontWeight: FontWeight.w600, fontSize: 20),),
+        title: Text('Atualização do Cadastro', style: TextStyle(color: Colors.blue.shade900, fontWeight: FontWeight.w600, fontSize: 20),),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -158,13 +161,37 @@ class _FormularioCadastroState extends State<FormularioCadastro> {
                 SizedBox(height: 25),
                 Container(
                   alignment: Alignment.center,
-                  child: buildSubmit(context),
+                  child: buildEdit(context, widget.cliente),
                 )
               ],
             ),
           ),
         ),
         autovalidateMode: AutovalidateMode.disabled,
+        initialValue: {
+          ClienteFields.razaoSocial : widget.cliente.razaoSocial,
+          ClienteFields.nomeFantasia : widget.cliente.nomeFantasia,
+          ClienteFields.pFisica : widget.cliente.pFisica,
+          ClienteFields.residenciaPropria : widget.cliente.residenciaPropria,
+          ClienteFields.endereco : widget.cliente.endereco,
+          ClienteFields.numeroRua : widget.cliente.numeroRua,
+          ClienteFields.bairro : widget.cliente.bairro,
+          ClienteFields.cidade : widget.cliente.cidade,
+          ClienteFields.cep : widget.cliente.cep,
+          ClienteFields.cnpj : widget.cliente.cnpj,
+          ClienteFields.pontoReferencia : widget.cliente.pontoReferencia,
+          ClienteFields.cgf : widget.cliente.cgf,
+          ClienteFields.contato : widget.cliente.contato,
+          ClienteFields.fone : widget.cliente.fone,
+          ClienteFields.email : widget.cliente.email,
+          ClienteFields.ref_1 : widget.cliente.ref_1,
+          ClienteFields.ref_2 : widget.cliente.ref_2,
+          ClienteFields.ref_3 : widget.cliente.ref_3,
+          ClienteFields.numero_1 : widget.cliente.numero_1,
+          ClienteFields.numero_2 : widget.cliente.numero_2,
+          ClienteFields.numero_3 : widget.cliente.numero_3,
+          ClienteFields.contato : widget.cliente.contato
+        },
       ),
     );
   }
@@ -341,10 +368,10 @@ builFoneReferencia(context, name){
   );
 }
 
-buildSubmit(context){
+buildEdit(context, Cliente cliente){
   return ElevatedButton(
-    onPressed: () => _criaNovoCadastro(context),
-    child: Text('Criar novo cadastro'),
+    onPressed: () => _atualizarCadastro(context, cliente),
+    child: Text('Atualizar cadastro'),
     style: ElevatedButton.styleFrom(
       padding: EdgeInsets.only(right: 20, left: 20, top: 16, bottom: 16),
       primary: Colors.blue.shade900,
@@ -373,22 +400,23 @@ builTextComentario(context, name){
   );
 }
 
-_criaNovoCadastro(context) async {
+_atualizarCadastro(context, Cliente cliente) async {
   var validat = formKey.currentState!.validate();
 
   if(validat){
     formKey.currentState!.save();
     var dados = formKey.currentState!.value;
     
-    var clienteModel = Cliente.generetaByMap(dados);
+    var clienteModel = Cliente.generetaByMapWithID(dados, id: cliente.id!);
 
-    var result = ClienteDatabase.instance.create(clienteModel);
+    
+    var result = await ClienteDatabase.instance.update(clienteModel);
 
     print(result);
     
-    final file = await PdfCadastro.generate(clienteModel);
-
-    PdfApi.openFile(file, context);
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => CadastroPage())
+    );
   }
 }
 

@@ -28,7 +28,7 @@ class PdfCadastro {
           )
         );
     
-        return PdfApi.saveDocument(name: 'Cadastro.pdf', pdf: pdf);
+        return PdfApi.saveDocument(name: '${cliente.contato}_analise.pdf', pdf: pdf);
       }
     
       static Widget buildCustomHeader(var imageJpg) => Row(

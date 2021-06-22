@@ -1,3 +1,4 @@
+import 'package:ads_proj/pages/cadastro_page.dart';
 import 'package:ads_proj/pages/formualario_cadastro.dart';
 import 'package:ads_proj/pages/vedendo_page.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +55,10 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: (){},
+              onPressed:() {
+                Navigator.of(context)
+                .push(MaterialPageRoute(builder: (context) => CadastroPage()));
+              },
               child: Text('Meus cadastros'),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.all(15),
