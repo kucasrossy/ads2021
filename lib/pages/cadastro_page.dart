@@ -78,7 +78,9 @@ class _CadastroPageState extends State<CadastroPage> {
                             onPressed: () {
                               setState(() {
                                 ControllerCadastro.deleteCadastro(_clienteLista[index].id!);
-                                getAllClientes();
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (context) => CadastroPage())
+                                );
                               });
                             },
                           ) 
